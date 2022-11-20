@@ -21,11 +21,11 @@ public class Player : KinematicBody2D
 		inputVector = inputVector.Normalized();
 
 		if (inputVector != Vector2.Zero)
-	    	// Adding acceleration and capping to max speed
-            Velocity = Velocity.MoveToward(inputVector * MAX_SPEED, ACCELERATION * delta);
+			// Adding acceleration and capping to max speed
+			Velocity = Velocity.MoveToward(inputVector * MAX_SPEED, ACCELERATION * delta);
 		else
-	    	// Adding friction to not stop abruptely
-		    Velocity = Velocity.MoveToward(Vector2.Zero, FRICTION * delta);
+			// Adding friction to not stop abruptely
+			Velocity = Velocity.MoveToward(Vector2.Zero, FRICTION * delta);
 
 		GD.Print(Velocity);
 

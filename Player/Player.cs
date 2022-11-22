@@ -7,15 +7,17 @@ public class Player : KinematicBody2D
 	private const Int16 FRICTION = 700;
 	private const Int16 MAX_SPEED = 100;
 
-	public Vector2 _velocity = Vector2.Zero;
-	public AnimationPlayer _animationPlayer = null;
-	public AnimationTree _animationTree = null;
+	private Vector2 _velocity = Vector2.Zero;
+	private AnimationPlayer _animationPlayer = null;
+	private AnimationTree _animationTree = null;
+	private AnimationNodeStateMachinePlayback _animationState = null;
 
 	public override void _Ready()
 	{
 		// Gets node from the same scene
 		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_animationTree = GetNode<AnimationTree>("AnimationTree");
+		_animationState = (AnimationNodeStateMachinePlayback)_animationTree.Get("parameters/playback");
 	}
 
 	public override void _PhysicsProcess(float delta)
@@ -34,8 +36,10 @@ public class Player : KinematicBody2D
 			_velocity = _velocity.MoveToward(inputDirection * MAX_SPEED, ACCELERATION * delta);
 		}
 		else
+		{
 			// Adding friction to not stop abruptely
 			_velocity = _velocity.MoveToward(Vector2.Zero, FRICTION * delta);
+		}
 
 		_velocity = MoveAndSlide(_velocity);
 	}
@@ -52,6 +56,12 @@ public class Player : KinematicBody2D
 		{
 			_animationTree.Set("parameters/Idle/blend_position", inputDirection);
 			_animationTree.Set("parameters/Run/blend_position", inputDirection);
+
+			_animationState.Travel("Run");
+		}
+		else
+		{
+			_animationState.Travel("Idle");
 		}
 	}
 

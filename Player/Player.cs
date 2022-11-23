@@ -10,22 +10,73 @@ public class Player : KinematicBody2D
 	private Vector2 _velocity = Vector2.Zero;
 	private AnimationPlayer _animationPlayer = null;
 	private AnimationTree _animationTree = null;
-	private AnimationNodeStateMachinePlayback _animationState = null;
+	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
+
+	private AnimationStateType _animationState = AnimationStateType.MOVE;
+
+	enum AnimationStateType
+	{
+		MOVE,
+		ATTACK,
+		ROLL,
+	}
 
 	public override void _Ready()
 	{
 		// Gets node from the same scene
 		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_animationTree = GetNode<AnimationTree>("AnimationTree");
-		_animationState = (AnimationNodeStateMachinePlayback)_animationTree.Get("parameters/playback");
+		_animationStateMachine = (AnimationNodeStateMachinePlayback)_animationTree.Get("parameters/playback");
+
+		// Activate player animations
+		_animationTree.Active = true;
 	}
 
 	public override void _PhysicsProcess(float delta)
 	{
 		var inputDirection = GetInputDirectionStrength();
 
+		switch (_animationState)
+		{
+			case AnimationStateType.MOVE:
+				ExecuteMoveState(inputDirection, delta);
+
+				if (Input.IsActionJustPressed("attack"))
+				{
+					_animationState = AnimationStateType.ATTACK;
+				}
+				break;
+			case AnimationStateType.ROLL:
+				break;
+			case AnimationStateType.ATTACK:
+				ExecuteAttackState(inputDirection);
+				break;
+		}
+	}
+
+	public void OnAttackAnimationFinished()
+	{
+		_animationState = AnimationStateType.MOVE;
+	}
+
+	private Vector2 GetInputDirectionStrength()
+	{
+		var inputVector = Vector2.Zero;
+
+		// Calculating new position
+		inputVector.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
+		inputVector.y = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
+
+		// Normalizing the positing in the viewport's cartesian plan
+		inputVector = inputVector.Normalized();
+
+		return inputVector;
+	}
+
+	private void ExecuteMoveState(Vector2 inputDirection, float delta)
+	{
 		MovePlayerPosition(inputDirection, delta);
-		AnimatePlayer(inputDirection);
+		AnimatePlayerMovement(inputDirection);
 	}
 
 	private void MovePlayerPosition(Vector2 inputDirection, float delta)
@@ -44,7 +95,7 @@ public class Player : KinematicBody2D
 		_velocity = MoveAndSlide(_velocity);
 	}
 
-	private void AnimatePlayer(Vector2 inputDirection)
+	private void AnimatePlayerMovement(Vector2 inputDirection)
 	{
 		// Must update animation only when movement key is being pressed,
 		// otherwise the start animation would be trigger.
@@ -56,26 +107,22 @@ public class Player : KinematicBody2D
 		{
 			_animationTree.Set("parameters/Idle/blend_position", inputDirection);
 			_animationTree.Set("parameters/Run/blend_position", inputDirection);
+			_animationTree.Set("parameters/Attack/blend_position", inputDirection);
 
-			_animationState.Travel("Run");
+			_animationStateMachine.Travel("Run");
 		}
 		else
 		{
-			_animationState.Travel("Idle");
+			_animationStateMachine.Travel("Idle");
 		}
 	}
 
-	private Vector2 GetInputDirectionStrength()
+	private void ExecuteAttackState(Vector2 inputDirection)
 	{
-		var inputVector = Vector2.Zero;
+		// Clear the velocity so the player doesn't continue
+		// to move after the attack animation.
+		_velocity = Vector2.Zero;
 
-		// Calculating new position
-		inputVector.x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-		inputVector.y = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
-
-		// Normalizing the positing in the viewport's cartesian plan
-		inputVector = inputVector.Normalized();
-
-		return inputVector;
+		_animationStateMachine.Travel("Attack");
 	}
 }

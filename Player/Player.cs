@@ -32,7 +32,7 @@ public class Player : KinematicBody2D
 		_animationTree.Active = true;
 	}
 
-	public override void _PhysicsProcess(float delta)
+	public override void _Process(float delta)
 	{
 		var inputDirection = GetInputDirectionStrength();
 

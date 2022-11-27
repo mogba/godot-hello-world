@@ -3,18 +3,18 @@ using System;
 
 public class Player : KinematicBody2D
 {
-	private const Int16 ACCELERATION = 700;
-	private const Int16 FRICTION = 700;
-	private const Int16 MAX_SPEED = 100;
-	private const Int16 ROLL_SPEED = 120;
-
 	private Vector2 _velocity = Vector2.Zero;
 	private Vector2 _rollDirection = Vector2.Zero;
-	private AnimationPlayer _animationPlayer = null;
 	private AnimationTree _animationTree = null;
 	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
-
+	
+	private SwordHitbox _swordHitbox = null;
 	private AnimationStateType _animationState = AnimationStateType.MOVE;
+
+	[Export] public Int16 Acceleration = 700;
+	[Export] public Int16 Friction = 700;
+	[Export] public Int16 MaxSpeed = 100;
+	[Export] public Int16 RollSpeed = 120;
 
 	enum AnimationStateType
 	{
@@ -26,9 +26,9 @@ public class Player : KinematicBody2D
 	public override void _Ready()
 	{
 		// Gets node from the same scene
-		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		_animationTree = GetNode<AnimationTree>("AnimationTree");
 		_animationStateMachine = (AnimationNodeStateMachinePlayback)_animationTree.Get("parameters/playback");
+		_swordHitbox = GetNode<SwordHitbox>("HitboxPivot/SwordHitbox");
 
 		// Activate player animations
 		_animationTree.Active = true;
@@ -109,15 +109,16 @@ public class Player : KinematicBody2D
 		if (inputDirection != Vector2.Zero)
 		{
 			// Adding acceleration capped to max speed
-			_velocity = _velocity.MoveToward(inputDirection * MAX_SPEED, ACCELERATION * delta);
+			_velocity = _velocity.MoveToward(inputDirection * MaxSpeed, Acceleration * delta);
 
 			// Save last pressed movement direction to use on the roll animation
 			_rollDirection = inputDirection;
+			_swordHitbox.Knockback = _rollDirection;
 		}
 		else
 		{
 			// Adding friction to not stop abruptely
-			_velocity = _velocity.MoveToward(Vector2.Zero, FRICTION * delta);
+			_velocity = _velocity.MoveToward(Vector2.Zero, Friction * delta);
 		}
 	}
 
@@ -146,7 +147,7 @@ public class Player : KinematicBody2D
 		// The direction of the roll animation cannot be changed.
 		// When the roll animation starts, its direction is tighted to
 		// the last direction value from the running animation.
-		_velocity = _rollDirection * ROLL_SPEED;
+		_velocity = _rollDirection * RollSpeed;
 		_animationStateMachine.Travel("Roll");
 		MovePlayer();
 	}

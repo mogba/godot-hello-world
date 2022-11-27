@@ -2,6 +2,9 @@ using Godot;
 
 public class Bat : KinematicBody2D
 {
+	private static PackedScene _enemyDeathEffectScene =
+		ResourceLoader.Load<PackedScene>("res://Effects/EnemyDeathEffect/EnemyDeathEffect.tscn");
+
 	private Vector2 _knockback = Vector2.Zero;
 	private int _knockbackForce = 200;
 	private AnimatedSprite _animatedSprite = null;
@@ -32,31 +35,8 @@ public class Bat : KinematicBody2D
 	public void _OnStatusNoHealth()
 	{
 		CreateEnemyDeathEffect();
-	}
-
-	// TODO: Refactor
-	private void CreateEnemyDeathEffect()
-	{
-		// Starts the dying animation before erasing the enemy
-		var deathEffectScene = GD.Load<PackedScene>("res://Effects/EnemyDeathEffect/EnemyDeathEffect.tscn");
-		var deathEffectInstance = deathEffectScene.Instance<EnemyDeathEffect>();
-
-		// Sets the effect's position to the same as the enemy's position
-		deathEffectInstance.GlobalPosition = GlobalPosition;
-		// deathEffectInstance.SetKnockback(_knockback, _knockbackForce);
-
-		// Add the effect's instance to the current scene
-		var world = GetTree().CurrentScene;
-		world.AddChild(deathEffectInstance);
-
-		deathEffectInstance.Connect("AnimationFinished", this, "RemoveEnemy");
-
-		// This enemy has to be erase from the 
-		// world when the death animation ends
-	}
-
-	public void RemoveEnemy()
-	{
 		QueueFree();
 	}
+
+	private void CreateEnemyDeathEffect() => _enemyDeathEffectScene.Instance<Effect>().AttachToRoot(this);
 }

@@ -1,6 +1,6 @@
 using Godot;
 
-public class SwordHitbox : Area2D
+public class SwordHitbox : Hitbox
 {
 	public Vector2 Knockback = Vector2.Zero;
 }

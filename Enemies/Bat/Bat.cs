@@ -24,8 +24,9 @@ public class Bat : KinematicBody2D
 
 	public void _OnHurtboxAreaEntered(Area2D area)
 	{
-		_status.Health -= 1;
-		_knockback = (area as SwordHitbox).Knockback * 120;
+		var swordHitbox = (area as SwordHitbox);
+		_status.Health -= swordHitbox.Damage;
+		_knockback = swordHitbox.Knockback * 120;
 	}
 
 	public void _OnStatusNoHealth()

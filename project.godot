@@ -88,6 +88,13 @@ roll={
  ]
 }
 
+[layer_names]
+
+2d_render/layer_1="World"
+2d_render/layer_2="Player"
+2d_render/layer_3="PlayerHurtbox"
+2d_render/layer_4="EnemyHurtbox"
+
 [mono]
 
 project/assembly_name="Best Game of The World"

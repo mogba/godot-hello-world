@@ -4,7 +4,7 @@ using System;
 public class Player : KinematicBody2D
 {
 	private Vector2 _velocity = Vector2.Zero;
-	private Vector2 _rollDirection = Vector2.Zero;
+	private Vector2 _rollDirection = Vector2.Down;
 	private AnimationTree _animationTree = null;
 	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
 	

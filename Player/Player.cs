@@ -63,6 +63,8 @@ public class Player : KinematicBody2D
 
 	public void OnRollAnimationFinished()
 	{
+		// Reduces the velocity so the player doesn't
+		// slide too much after the animation is finished.
 		_velocity *= 0.6f;
 		ResetAnimationStateToMove();
 	}
@@ -109,6 +111,7 @@ public class Player : KinematicBody2D
 			// Adding acceleration capped to max speed
 			_velocity = _velocity.MoveToward(inputDirection * MAX_SPEED, ACCELERATION * delta);
 
+			// Save last pressed movement direction to use on the roll animation
 			_rollDirection = inputDirection;
 		}
 		else
@@ -140,6 +143,9 @@ public class Player : KinematicBody2D
 
 	private void ExecuteStateRoll(Vector2 inputDirection)
 	{
+		// The direction of the roll animation cannot be changed.
+		// When the roll animation starts, its direction is tighted to
+		// the last direction value from the running animation.
 		_velocity = _rollDirection * ROLL_SPEED;
 		_animationStateMachine.Travel("Roll");
 		MovePlayer();

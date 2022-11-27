@@ -10,7 +10,7 @@ public class Grass : Node2D
 
 	private void CreateGrassEffect()
 	{
-		var scene = GD.Load<PackedScene>("res://Effects/GrassEffect.tscn");
+		var scene = GD.Load<PackedScene>("res://Effects/GrassEffect/GrassEffect.tscn");
 		var instance = scene.Instance<GrassEffect>();
 		instance.GlobalPosition = GlobalPosition;
 

@@ -27,7 +27,7 @@ public class Effect : AnimatedSprite
     public void AttachToRoot(Node2D node)
     {
         GlobalPosition = node.GlobalPosition;
-        // node.GetTree().CurrentScene -> this gets the root node
+        // node.GetTree().CurrentScene -> gets the root node
 		node.GetParent().AddChild(this);
     }
 }

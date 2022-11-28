@@ -1,22 +1,21 @@
 using Godot;
-using System;
 
 public class Player : KinematicBody2D
 {
 	private Vector2 _velocity = Vector2.Zero;
 	private Vector2 _rollDirection = Vector2.Down;
-	private AnimationTree _animationTree = null;
-	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
-	
 	private SwordHitbox _swordHitbox = null;
 	private AnimationStateType _animationState = AnimationStateType.MOVE;
 
-	[Export] public Int16 Acceleration = 700;
-	[Export] public Int16 Friction = 700;
-	[Export] public Int16 MaxSpeed = 100;
-	[Export] public Int16 RollSpeed = 120;
+	private AnimationTree _animationTree = null;
+	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
+	
+	[Export] public int Acceleration = 700;
+	[Export] public int Friction = 700;
+	[Export] public int MaxSpeed = 100;
+	[Export] public int RollSpeed = 120;
 
-	enum AnimationStateType
+	private enum AnimationStateType
 	{
 		MOVE,
 		ATTACK,

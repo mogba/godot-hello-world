@@ -6,6 +6,7 @@ public class Player : KinematicBody2D
 	private Vector2 _rollDirection = Vector2.Down;
 	private SwordHitbox _swordHitbox = null;
 	private AnimationStateType _animationState = AnimationStateType.MOVE;
+	private Status _status = null;
 
 	private AnimationTree _animationTree = null;
 	private AnimationNodeStateMachinePlayback _animationStateMachine = null;
@@ -29,8 +30,20 @@ public class Player : KinematicBody2D
 		_animationStateMachine = (AnimationNodeStateMachinePlayback)_animationTree.Get("parameters/playback");
 		_swordHitbox = GetNode<SwordHitbox>("HitboxPivot/SwordHitbox");
 
+		// PlayStatus is an AutoLoad singleton. It's a global 
+		// variable/node that is under the root tree an can be
+		// accessed in any place just like any other normal node.
+		// PS: In GDScript, AutoLoad variables can be accessed
+		// directly by its name. It's a syntactic sugar.
+		_status = GetNode<Status>("/root/PlayerStatus");
+
 		// Activate player animations
 		_animationTree.Active = true;
+
+		// When referencing Godot's built-in functions by strings,
+		// the functions' name must be just like in GDSCript, in
+		// snake_case instead of the C# standard PascalCase. 
+		_status.Connect("NoHealth", this, "queue_free");
 	}
 
 	public override void _PhysicsProcess(float delta)
@@ -58,6 +71,11 @@ public class Player : KinematicBody2D
 				ExecuteStateAttack(inputDirection);
 				break;
 		}
+	}
+
+	public void _OnHurtboxAreaEntered(Area2D area)
+	{
+		_status.Health -= 1;
 	}
 
 	public void OnRollAnimationFinished()
